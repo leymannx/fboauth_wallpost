@@ -1,0 +1,57 @@
+<?php
+/**
+ * @file
+ * FBOAuth Wallpost Example.
+ *
+ * Provides a block with a link to post a message to a user's Facebook wall.
+ */
+
+/**
+ * Implements hook_fboauth_actions().
+ */
+function fboauth_wallpost_fboauth_actions() {
+
+  $actions['fboauth_wallpost_action'] = array(
+    'title' => t('FBOAuth WallPost'),
+    'callback' => 'fboauth_wallpost_callback',
+    'permissions' => array(
+      'publish_actions',
+    ),
+  );
+  return $actions;
+}
+
+/**
+ * Facebook OAuth action callback; Post to a user's Facebook wall.
+ */
+function fboauth_wallpost_callback($app_id, $access_token) {
+
+  fboauth_graph_query('me/feed', $access_token, array('message' => 'This is a test message, don\'t bother.'), 'POST');
+  drupal_set_message(t('Done!'));
+  return 'node';
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function fboauth_wallpost_block_info() {
+
+  $blocks['fboauth_wallpost_link'] = array(
+    'info' => t('FBOAuth WallPost'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function fboauth_wallpost_block_view($delta = '') {
+
+  switch ($delta) {
+    case 'fboauth_wallpost_link':
+      $block['subject'] = '';
+      $block['content'] = fboauth_action_display('fboauth_wallpost_action');
+      break;
+  }
+  return $block;
+}
