@@ -32,6 +32,7 @@ function fboauth_wallpost_fboauth_actions() {
  */
 function fboauth_wallpost_callback($app_id, $access_token) {
 
+  // Available fields at https://developers.facebook.com/docs/graph-api/reference/v2.5/user/feed#publish
   $fields = array(
     // message - string - The main body of the post.
     'message' => 'This is a test message, don\'t bother.',
