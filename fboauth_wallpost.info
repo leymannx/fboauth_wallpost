@@ -1,0 +1,7 @@
+name = FBOAuth WallPost
+description = Provides a block with a link to post a custom message to a Facebook user's wall.
+core = 7.x
+package = Custom
+version = 7.x-1.0
+# May work with newer versions as well. It's just the one I tested it with.
+dependencies[] = fboauth (7.x-2.0-rc1)
