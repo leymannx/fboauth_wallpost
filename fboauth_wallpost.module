@@ -17,6 +17,12 @@ function fboauth_wallpost_fboauth_actions() {
     'permissions' => array(
       'publish_actions',
     ),
+    // Optionally define a theme function for printing out your link (not
+    // including the "theme_" prefix). If you use this option, you must register
+    // this function in hook_theme(). If you don't use this option, the link
+    // will be output with the theme_fboauth_action() function or the automatic
+    // suggestion theme_fboauth_action__[action_name]().
+    // 'theme' => 'fboauth_wallpost_action',
   );
   return $actions;
 }
@@ -26,8 +32,28 @@ function fboauth_wallpost_fboauth_actions() {
  */
 function fboauth_wallpost_callback($app_id, $access_token) {
 
-  fboauth_graph_query('me/feed', $access_token, array('message' => 'This is a test message, don\'t bother.'), 'POST');
+  $fields = array(
+    // message - string - The main body of the post.
+    'message' => 'This is a test message, don\'t bother.',
+    // link - string - The URL of a link to attach to the post.
+    'link' => 'http://tatortpodcast.de',
+    // picture - string - Determines the preview image associated with the link.
+    'picture' => 'http://tatortpodcast.de/sites/default/files/tatortpodcast.png',
+    // name - string - Overwrites the title of the link preview.
+    'name' => 'ZTGZ | Der GZSZ Podcast',
+    // caption - string - Overwrites the caption under the title in the link preview.
+    'caption' => 'Lorem ipsum dolor sit amet.',
+    // description - string - Overwrites the description in the link preview.
+    'description' => 'This is a short description',
+  );
+
+  fboauth_graph_query('me/feed', $access_token, $fields, 'POST');
   drupal_set_message(t('Done!'));
+
+  // Optionally return a path to which the user will be redirected. If not set
+  // the path in the $_REQUEST['destination'] variable will be used. If there
+  // is no path at all specified, the user will be redirected to the homepage.
+  // return 'mymodule/import-complete';
   return 'node';
 }
 
