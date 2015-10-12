@@ -37,7 +37,7 @@ function fboauth_wallpost_callback($app_id, $access_token) {
     // message - string - The main body of the post.
     'message' => 'This is a test message, don\'t bother.',
     // link - string - The URL of a link to attach to the post.
-    'link' => 'http://tatortpodcast.de',
+    'link' => $_SESSION['fboauth_custom_link'],
     // picture - string - Determines the preview image associated with the link.
     'picture' => 'http://tatortpodcast.de/sites/default/files/tatortpodcast.png',
     // name - string - Overwrites the title of the link preview.
@@ -77,8 +77,51 @@ function fboauth_wallpost_block_view($delta = '') {
   switch ($delta) {
     case 'fboauth_wallpost_link':
       $block['subject'] = '';
-      $block['content'] = fboauth_action_display('fboauth_wallpost_action');
+
+      // When you are happy with a simple button that grabs it's value maybe
+      // from a fixed system settings form, than the following line will work
+      // perfectly:
+      // $block['content'] = fboauth_action_display('fboauth_wallpost_action');
+
+      // But if you need to trigger the action programmatically, then look a the
+      // fboauth_wallpostform() below:
+      $block['content'] = drupal_get_form('fboauth_wallpostform');
       break;
   }
   return $block;
+}
+
+/**
+ * Implements hook_form().
+ */
+function fboauth_wallpostform() {
+
+  $form['fboauth_wallpost_link'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Link'),
+    '#size' => 28,
+    '#required' => TRUE,
+  );
+  $form['fboauth_wallpost_button'] = array(
+    '#type' => 'submit',
+    '#value' => t('FBOauth WallPost'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_form_submit().
+ */
+function fboauth_wallpostform_submit($form, &$form_state) {
+
+  // Didn't found another solution to pass a dynamic link value from form to FB.
+  $_SESSION['fboauth_custom_link'] = $form_state['values']['fboauth_wallpost_link'];
+
+  // Get link array from fboauth module for making the FB request.
+  $fboauth_link_array = fboauth_action_link_properties('fboauth_wallpost_action');
+  // Build the fboauth URL.
+  $full_fboauth_url = url($fboauth_link_array['href'], array('absolute' => TRUE, 'query' => array($fboauth_link_array['query'])));
+  // Fire!
+  drupal_goto($full_fboauth_url);
 }
